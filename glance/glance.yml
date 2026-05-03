@@ -1,0 +1,14 @@
+branding:
+  logo-text: "ARC"
+  app-name: "ARC Dashboard"
+  app-background-color: "#22232e"
+  hide-footer: true
+
+pages:
+  - name: Dashboard
+    width: wide
+    $include: pages/dashboard.yml
+
+  - name: System
+    width: wide
+    $include: pages/system.yml

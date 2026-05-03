@@ -1,0 +1,28 @@
+head-widgets:
+  - type: server-stats
+    servers:
+      - type: local
+        name: MochaNet (Pi 5)
+        hide-swap: true
+        hide-mountpoints-by-default: true
+        mountpoints:
+          "/":
+            name: "OS (SD Card)"
+            hide: false
+
+columns:
+  - size: full
+    widgets:
+      - type: docker-containers
+        hide-by-default: false
+        format-container-names: true
+
+  - size: small
+    widgets:
+      - type: releases
+        title: Self-Hosted Updates
+        cache: 6h
+        repositories:
+          - glanceapp/glance
+          - go-gitea/gitea
+          - immich-app/immich

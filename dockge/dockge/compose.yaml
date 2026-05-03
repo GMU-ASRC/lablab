@@ -1,0 +1,15 @@
+services:
+  dockge:
+    image: louislam/dockge:1
+    container_name: dockge
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data:/app/data
+      # Dockge Rule: Left side MUST match right side exactly
+      - /mnt/MochaNet/stacks:/mnt/MochaNet/stacks
+    environment:
+      # Tell Dockge where the stacks are located
+      - DOCKGE_STACKS_DIR=/mnt/MochaNet/stacks

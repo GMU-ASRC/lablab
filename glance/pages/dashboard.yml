@@ -1,0 +1,119 @@
+columns:
+  - size: small
+    widgets:
+      - type: clock
+        hour-format: 12h
+
+      - type: calendar
+        first-day-of-week: monday
+
+      - type: rss
+        title: Robotics News
+        limit: 6
+        collapse-after: 4
+        cache: 2h
+        feeds:
+          - url: "https://spectrum.ieee.org/feeds/feed.rss?topic=robotics"
+            title: "IEEE Spectrum"
+
+  - size: full
+    widgets:
+      - type: search
+        search-engine: google
+        bangs:
+          - title: YouTube
+            shortcut: "!yt"
+            url: https://www.youtube.com/results?search_query={QUERY}
+          - title: Wikipedia
+            shortcut: "!w"
+            url: https://en.wikipedia.org/wiki/Special:Search?search={QUERY}
+          - title: Amazon
+            shortcut: "!a"
+            url: https://www.amazon.com/s?k={QUERY}
+          - title: Reddit
+            shortcut: "!r"
+            url: https://www.reddit.com/search/?q={QUERY}
+          - title: GitHub
+            shortcut: "!gh"
+            url: https://github.com/search?q={QUERY}
+          - title: Docker Hub
+            shortcut: "!dh"
+            url: https://hub.docker.com/search?q={QUERY}
+          - title: ROS2 Docs
+            shortcut: "!ros"
+            url: https://docs.ros.org/en/jazzy/search.html?q={QUERY}
+
+      - type: bookmarks
+        groups:
+          - name: ARC
+            links:
+              - title: GitHub
+                url: "https://github.com/ARC-GMU"
+                icon: "si:github"
+              - title: Club Website
+                url: "https://gmu.autonomousrobotics.club/"
+                icon: "si:instructables"
+              - title: Management
+                url: "https://manage.autonomousrobotics.club/"
+                icon: "si:googledocs"
+              - title: Google Drive
+                url: "https://drive.google.com/drive/u/1/folders/1OrzkDn7d26FIf443OAUQ1qqjsxw_XFy-"
+                icon: "si:googledrive"
+          - name: Development
+            links:
+              - title: Coder
+                url: "http://coder.robotics.lab"
+                icon: "si:visualstudiocode"
+              - title: AFFiNE
+                url: "http://wiki.robotics.lab"
+                icon: "si:notion"
+              - title: JupyterHub
+                url: "http://jupyter.robotics.lab"
+                icon: "si:jupyter"
+          - name: Infrastructure
+            links:
+              - title: Authentik
+                url: "https://auth.autonomousrobotics.club"
+                icon: "si:authentik"
+              - title: Netbird
+                url: "https://netbird.autonomousrobotics.club"
+                icon: "si:wireguard"
+              - title: Dockge
+                url: "http://docker.robotics.lab"
+                icon: "si:docker"
+
+      - type: monitor
+        title: Service Health
+        cache: 1m
+        sites:
+          - title: Dockge
+            url: http://docker.robotics.lab
+            icon: si:docker
+          - title: Authentik
+            url: https://auth.autonomousrobotics.club
+            icon: si:authentik
+          - title: Netbird
+            url: https://netbird.autonomousrobotics.club
+            icon: si:wireguard
+          - title: Management
+            url: https://manage.autonomousrobotics.club
+            icon: si:googledocs
+          - title: Club Site
+            url: https://gmu.autonomousrobotics.club
+            icon: si:instructables
+
+  - size: small
+    widgets:
+      - type: weather
+        location: Fairfax, Virginia, United States
+        units: imperial
+        hour-format: 12h
+
+      - type: releases
+        title: Project Updates
+        cache: 6h
+        repositories:
+          - ARC-GMU
+          - glanceapp/glance
+          - go-gitea/gitea
+          - ros2/ros2
