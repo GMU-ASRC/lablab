@@ -4,7 +4,6 @@
 ![OS](https://img.shields.io/badge/OS-Raspberry%20Pi%20OS-c51a4a?logo=linux&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
 ![Managed by](https://img.shields.io/badge/managed%20by-Dockge-5c00d3?logoColor=white)
-![License](https://img.shields.io/badge/license-MIT-green)
 
 Configuration-as-code for **MochaNet** — the ARC homelab server running on a Raspberry Pi 5.
 
