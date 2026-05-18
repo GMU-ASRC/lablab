@@ -9,7 +9,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./data:/app/data
       # Dockge Rule: Left side MUST match right side exactly
-      - /mnt/MochaNet/stacks:/mnt/MochaNet/stacks
+      - /home/arc/stacks:/home/arc/stacks
     environment:
       # Tell Dockge where the stacks are located
-      - DOCKGE_STACKS_DIR=/mnt/MochaNet/stacks
+      - DOCKGE_STACKS_DIR=/home/arc/stacks

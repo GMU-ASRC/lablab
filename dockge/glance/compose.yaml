@@ -7,7 +7,7 @@ services:
       - "8080:8080"
     volumes:
       # We mount the FOLDER to /app/config
-      - /mnt/MochaNet/stacks/glance/config:/app/config
+      - /home/arc/stacks/glance/config:/app/config
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
       # Add the Docker socket so Glance can show your container status

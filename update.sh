@@ -7,8 +7,8 @@ set -euo pipefail
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 declare -A SERVICES=(
-  [glance]="/mnt/MochaNet/stacks/glance/config"
-  [dockge]="/mnt/MochaNet/stacks"
+  [glance]="/home/arc/stacks/glance/config"
+  [dockge]="/home/arc/stacks"
 )
 
 for service in "${!SERVICES[@]}"; do

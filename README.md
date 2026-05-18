@@ -14,7 +14,7 @@ Configuration-as-code for **MochaNet** — the ARC homelab server running on a R
 ### Dockge
 ![Dockge](https://img.shields.io/badge/Dockge-:5001-5c00d3?logo=docker&logoColor=white)
 
-Container management UI. Stacks stored at `/mnt/MochaNet/stacks`.
+Container management UI. Stacks stored at `/home/arc/stacks`.
 
 ### Glance
 ![Glance](https://img.shields.io/badge/Glance-:8080-0ea5e9?logo=googlechrome&logoColor=white)
