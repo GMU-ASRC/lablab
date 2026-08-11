@@ -50,8 +50,8 @@ columns:
               - title: GitHub
                 url: "https://github.com/ARC-GMU"
                 icon: "si:github"
-              - title: Club Website
-                url: "https://gmu.autonomousrobotics.club/"
+              - title: Lab Website
+                url: "https://create.autonomousrobotics.club/"
                 icon: "si:instructables"
               - title: Management
                 url: "https://manage.autonomousrobotics.club/"
@@ -64,15 +64,6 @@ columns:
               - title: Coder
                 url: "http://coder.robotics.lab"
                 icon: "si:visualstudiocode"
-              - title: AFFiNE
-                url: "http://wiki.robotics.lab"
-                icon: "si:notion"
-              - title: JupyterHub
-                url: "http://jupyter.robotics.lab"
-                icon: "si:jupyter"
-              - title: Gitea
-                url: "https://git.sirblob.co"
-                icon: "si:gitea"
               - title: Kaneo
                 url: "https://tasks.autonomousrobotics.club"
                 icon: "si:kaneo"
@@ -116,8 +107,8 @@ columns:
           - title: Management
             url: https://manage.autonomousrobotics.club
             icon: si:googledocs
-          - title: Club Site
-            url: https://gmu.autonomousrobotics.club
+          - title: Lab Website
+            url: https://create.autonomousrobotics.club
             icon: si:instructables
           - title: Grafana
             url: http://grafana.robotics.lab
