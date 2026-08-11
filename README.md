@@ -16,6 +16,7 @@ model.
 
 - [Docs.md](Docs.md) - deployment model, services table, per-stack notes.
 - [PORTS.md](PORTS.md) - every published host port and what owns it.
+- [scripts/README.md](scripts/README.md) - the helper scripts (env bootstrap).
 
 ## Stacks
 

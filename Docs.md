@@ -7,6 +7,7 @@ Dockge stack, following the same layout as the main homelab (`docker/`).
 ## Related documentation
 
 - `PORTS.md` - every published host port and what owns it.
+- `scripts/README.md` - the helper scripts (env bootstrap).
 
 ## Deployment model
 
