@@ -25,4 +25,9 @@ columns:
         repositories:
           - glanceapp/glance
           - go-gitea/gitea
+          - go-gitea/act_runner
           - immich-app/immich
+          - louislam/dockge
+          - NginxProxyManager/nginx-proxy-manager
+          - grafana/grafana
+          - prometheus/prometheus

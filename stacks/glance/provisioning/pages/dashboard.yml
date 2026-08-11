@@ -70,6 +70,9 @@ columns:
               - title: JupyterHub
                 url: "http://jupyter.robotics.lab"
                 icon: "si:jupyter"
+              - title: Gitea
+                url: "https://git.sirblob.co"
+                icon: "si:gitea"
           - name: Infrastructure
             links:
               - title: Authentik
@@ -81,6 +84,12 @@ columns:
               - title: Dockge
                 url: "http://docker.robotics.lab"
                 icon: "si:docker"
+              - title: Grafana
+                url: "http://grafana.robotics.lab"
+                icon: "si:grafana"
+              - title: Immich
+                url: "http://photos.robotics.lab"
+                icon: "si:immich"
 
       - type: monitor
         title: Service Health
@@ -101,6 +110,12 @@ columns:
           - title: Club Site
             url: https://gmu.autonomousrobotics.club
             icon: si:instructables
+          - title: Grafana
+            url: http://grafana.robotics.lab
+            icon: si:grafana
+          - title: Immich
+            url: http://photos.robotics.lab
+            icon: si:immich
 
   - size: small
     widgets:

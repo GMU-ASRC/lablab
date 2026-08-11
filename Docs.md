@@ -136,7 +136,13 @@ gitea-runner, `DB_PASSWORD` for immich). `.env` files are gitignored.
   homelab tracks Grafana's `provisioning/` folder. It mounts to `/app/config`
   inside the container. Also gets the docker socket (read-only) so the
   `docker-containers` widget can show container status, and the host
-  timezone files so the clock widget matches the host.
+  timezone files so the clock widget matches the host. The bookmarks and
+  monitor widgets in `pages/dashboard.yml` link to `grafana.robotics.lab`
+  and `photos.robotics.lab` (immich) alongside the existing `.robotics.lab`
+  entries; those two are naming intent, not yet backed by an NPM proxy
+  host or Netbird DNS entry, add those before expecting the links to
+  resolve. `pages/system.yml`'s release tracker follows what is actually
+  deployed here, so keep it in sync when adding or removing a stack.
 - **npm:** `./data` and `./letsencrypt` hold NPM's own database and
   certificates. Both are runtime state, not config-as-code, so they are
   gitignored. Admin UI is on port `81`; ports `80`/`443` are the public
@@ -203,6 +209,9 @@ gitea-runner, `DB_PASSWORD` for immich). `.env` files are gitignored.
   on local disk, not a network share" rule from the main homelab is
   satisfied automatically here. `model-cache` stays a plain named volume,
   it is re-downloadable ML model data, not worth tracking as a bind mount.
+  `glance` links to it at `photos.robotics.lab`, an NPM proxy host to
+  `2283` and a Netbird DNS entry for that hostname still need setting up,
+  see the `glance` note above.
 
 ## Maintenance
 
