@@ -45,7 +45,7 @@ columns:
 
       - type: bookmarks
         groups:
-          - name: ARC
+          - name: CREATE LAB
             links:
               - title: GitHub
                 url: "https://github.com/ARC-GMU"
