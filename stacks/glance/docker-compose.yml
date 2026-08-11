@@ -4,11 +4,9 @@ services:
     container_name: glance
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - 8080:8080
     volumes:
-      # We mount the FOLDER to /app/config
-      - /home/arc/stacks/glance/config:/app/config
+      - ./provisioning:/app/config
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-      # Add the Docker socket so Glance can show your container status
       - /var/run/docker.sock:/var/run/docker.sock:ro
