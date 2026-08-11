@@ -1,0 +1,23 @@
+services:
+  ftp:
+    image: stilliard/pure-ftpd:latest
+    container_name: ftp
+    restart: unless-stopped
+    environment:
+      - PUBLICHOST=${FTP_PUBLIC_HOST}
+      - FTP_USER_NAME=${FTP_USER_NAME:-admin}
+      - FTP_USER_PASS=${FTP_USER_PASS}
+      - FTP_USER_HOME=/home/admin
+      - FTP_USER_UID=1000
+      - FTP_USER_GID=1000
+      - ADDED_FLAGS=-d -P ${FTP_PUBLIC_HOST} -p 30000:30009 -C 5 --tls=2
+      - TLS_CN=${FTP_PUBLIC_HOST}
+      - TLS_ORG=lablab
+      - TLS_C=US
+    volumes:
+      - ./data:/home/admin
+      - ./config/pureftpd:/etc/pure-ftpd/passwd
+      - ./config/tls:/etc/ssl/private
+    ports:
+      - "2121:21"
+      - "30000-30009:30000-30009"

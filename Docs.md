@@ -33,6 +33,7 @@ update pushed from elsewhere), then use Dockge to restart the affected stack.
 | worker | worker | ghcr.io/gmu-asrc/astro-swarm-web-worker:latest | none | `./data` | Godot eval worker, needs an NVIDIA GPU host |
 | grafana | grafana | grafana/grafana:latest | 3300 | `./data`, `./provisioning` | Dashboards, Netbird VPN only |
 | prometheus | prometheus, node-exporter | prom/prometheus:latest, prom/node-exporter:latest | 9090, host (9100) | `./data` | Metrics feeding grafana, Netbird VPN only |
+| ftp | ftp | stilliard/pure-ftpd:latest | 2121, 30000-30009 | `./data`, `./config` | FTPS (TLS enforced), single admin user |
 
 None of these services need a database, so there is no shared datastore stack
 here (unlike the main homelab's `core-postgres`/`core-valkey`).
@@ -54,10 +55,10 @@ provisioned datasource in
 
 ## Secrets and `.env`
 
-`worker` and `grafana` need secrets. Each has an `.env.example` template;
-copy it to `.env` and fill in real values (`API_SECRET_KEY` for worker,
-`GRAFANA_ADMIN_USER`/`GRAFANA_ADMIN_PASSWORD` for grafana). `.env` files are
-gitignored.
+`worker`, `grafana`, and `ftp` need secrets. Each has an `.env.example`
+template; copy it to `.env` and fill in real values (`API_SECRET_KEY` for
+worker, `GRAFANA_ADMIN_USER`/`GRAFANA_ADMIN_PASSWORD` for grafana,
+`FTP_PUBLIC_HOST`/`FTP_USER_PASS` for ftp). `.env` files are gitignored.
 
 ## Per-stack notes
 
@@ -98,6 +99,17 @@ gitignored.
   (`extra_hosts: host.docker.internal:host-gateway` resolves the host from
   inside the container). Not exposed via NPM; Netbird VPN only, same as
   `grafana`.
+- **ftp:** Single `stilliard/pure-ftpd` user, TLS enforced (`--tls=2` in
+  `ADDED_FLAGS`), so this is FTPS only, plaintext FTP connections are
+  refused. The image generates a self-signed cert on first start if none is
+  present at `/etc/ssl/private`; `./config/tls` persists it across restarts
+  so clients don't see a new cert (and a new trust prompt) every time.
+  `FTP_PUBLIC_HOST` must be the host's real reachable IP or hostname, it is
+  used both for the passive-mode `PASV` reply and the TLS cert's CN, and
+  must match on the client side too since passive mode depends on it.
+  Passive ports `30000-30009` must stay open alongside `2121`. `./data` is
+  the FTP root, `./config/pureftpd` holds the virtual-user password
+  database.
 
 ## Maintenance
 

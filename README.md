@@ -52,3 +52,9 @@ Copy `stacks/grafana/.env.example` to `.env` and fill in admin credentials.
 ![Prometheus](https://img.shields.io/badge/Prometheus-:9090-E6522C?logo=prometheus&logoColor=white)
 
 Metrics collector, plus `node-exporter` for host metrics. Netbird VPN only.
+
+### FTP
+![FTP](https://img.shields.io/badge/FTPS-:2121-2b8a3e?logo=files&logoColor=white)
+
+FTPS only (plaintext FTP refused). Copy `stacks/ftp/.env.example` to `.env`
+and set `FTP_PUBLIC_HOST` to the host's real reachable address.
