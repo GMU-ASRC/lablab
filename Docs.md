@@ -49,6 +49,7 @@ stack.
 | gitea-runner | gitea-runner | gitea/act_runner:latest | none | `./data` | Registers against git.sirblob.co, no local Gitea |
 | immich | immich_server, immich_machine_learning, immich_redis, immich_postgres | ghcr.io/immich-app/immich-server, immich-machine-learning, valkey, immich-app/postgres | 2283 | `./data` | Photo library, GPU-accelerated ML (RTX 2080 Ti) |
 | kaneo | kaneo, kaneo-cloudflared | ghcr.io/usekaneo/kaneo:latest, cloudflare/cloudflared:latest | 5173 | none | Task tracker, uses `core-postgres`, public via Cloudflare Tunnel |
+| coder | coder | ghcr.io/coder/coder:latest | 8005 | none | Cloud dev environments, uses `core-postgres`, migrated off its own `coder-db` |
 
 `kaneo` is the first stack that actually reuses `databases`: instead of
 bundling its own Postgres like the upstream Kaneo docs show, it points
@@ -134,15 +135,17 @@ has an `.env.example` template; copy it to `.env` and fill in real values
 (`API_SECRET_KEY` for worker, `GRAFANA_ADMIN_USER`/`GRAFANA_ADMIN_PASSWORD`
 for grafana, `FTP_PUBLIC_HOST`/`FTP_USER_PASS` for ftp, `POSTGRES_PASSWORD`
 for databases, `GITEA_RUNNER_TOKEN` for gitea-runner, `DB_PASSWORD` for
-immich, `AUTH_SECRET`/`S3_ACCESS_KEY_ID`/`S3_SECRET_ACCESS_KEY` for kaneo).
-`.env` files are gitignored.
+immich, `AUTH_SECRET`/`S3_ACCESS_KEY_ID`/`S3_SECRET_ACCESS_KEY` for kaneo,
+`GITHUB_CLIENT_ID`/`GITHUB_CLIENT_SECRET` for coder). `.env` files are
+gitignored.
 
-`KANEO_DB_PASSWORD` is set in two places and must match, same pattern as
-the main homelab's shared-database passwords:
+`KANEO_DB_PASSWORD` and `CODER_DB_PASSWORD` are each set in two places and
+must match, same pattern as the main homelab's shared-database passwords:
 
 | Variable | Set in | Must match |
 | --- | --- | --- |
 | `KANEO_DB_PASSWORD` | `databases/.env`, `kaneo/.env` | kaneo role |
+| `CODER_DB_PASSWORD` | `databases/.env`, `coder/.env` | coder role |
 
 ## Per-stack notes
 
@@ -205,8 +208,8 @@ the main homelab's shared-database passwords:
   the FTP root, `./config/pureftpd` holds the virtual-user password
   database.
 - **databases:** `core-postgres` and `core-valkey`, no host ports; reachable
-  only over `core-data`. No stack here uses it yet, see "If a stack needs a
-  database" above for how to add one.
+  only over `core-data`. `kaneo` and `coder` both use `core-postgres`, see
+  "If a stack needs a database" above for how to add another.
 - **gitea-runner:** `gitea/act_runner`, no local Gitea, just a runner that
   registers against the main homelab's Gitea at `git.sirblob.co`
   (`GITEA_INSTANCE_URL`). Generate `GITEA_RUNNER_TOKEN` on that instance
@@ -252,6 +255,49 @@ the main homelab's shared-database passwords:
   `tasks.autonomousrobotics.club` needs adding as the public hostname, both
   external to this repo. `KANEO_CLIENT_URL` is set to that hostname so the
   app generates correct links once the tunnel is live.
+- **coder:** Migrated off its own bundled `coder-db` (`postgres:15`) onto
+  the shared `core-postgres`, same as the main homelab's `coder` stack;
+  `CODER_DB_PASSWORD` must match `databases/.env`. `scripts/migrate-legacy-stacks.sh`
+  handles the actual data move (dumps the old `coder-db`, restores into
+  `core-postgres`'s `coder` database), see that script and "Migrating off
+  the legacy `/home/arc/stacks` layout" below. `group_add: ["984"]` gives
+  the container the host's `docker` group GID for the docker socket mount,
+  that GID is host-specific (`getent group docker` to check it still
+  matches after any OS reinstall). `GITHUB_CLIENT_ID`/`GITHUB_CLIENT_SECRET`
+  come from a GitHub OAuth App (callback URL
+  `http://coder.robotics.lab/api/v2/users/oauth2/github/callback`).
+  `CODER_ACCESS_URL=http://coder.robotics.lab` matches the hostname
+  `glance` already links to. No GPU reservation here, unlike the main
+  homelab's `coder` stack; add `deploy.resources.reservations.devices` if
+  workspaces need the RTX 2080 Ti later.
+
+## Migrating off the legacy `/home/arc/stacks` layout
+
+Before this repo, `npm`, `dockge`, and `coder` (with its own `coder-db`)
+ran as ad hoc compose files directly under `/home/arc/stacks`, with no
+`.env.example`, no shared database, and no git history. Run
+`./scripts/migrate-legacy-stacks.sh` once to move onto this repo's layout
+without losing data:
+
+- `npm`: stops the legacy `nginx-proxy-manager` container, then copies
+  `/home/arc/stacks/npm/data` and `/home/arc/stacks/npm/letsencrypt` into
+  `stacks/npm/data` and `stacks/npm/letsencrypt`.
+- `dockge`: stops the legacy `dockge` container, then copies
+  `/home/arc/stacks/dockge/data` into `stacks/dockge/data`.
+- `coder`: requires `core-postgres` (the `databases` stack) already
+  running. Creates the `coder` role/database on `core-postgres` if it does
+  not exist yet, `pg_dump`s the legacy `coder-db` container to
+  `$BACKUP_ROOT/coder-db-migration-<timestamp>.sql` (a safety copy that is
+  kept regardless of what happens next), then restores that dump into
+  `core-postgres`. Stops the legacy `coder` and `coder-db` containers last.
+
+The script never deletes anything, it only stops legacy containers and
+copies data; the legacy `/home/arc/stacks` directory and the old
+`coder-db-data` volume are left in place until you have verified the new
+stacks work and remove them by hand. `LEGACY_ROOT` (default
+`/home/arc/stacks`) and `CODER_DB_PASSWORD` (required, no default) are
+read from the environment, so run it as
+`CODER_DB_PASSWORD=... ./scripts/migrate-legacy-stacks.sh`.
 
 ## Maintenance
 

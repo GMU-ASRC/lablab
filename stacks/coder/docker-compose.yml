@@ -1,0 +1,26 @@
+services:
+  coder:
+    image: ghcr.io/coder/coder:latest
+    container_name: coder
+    restart: unless-stopped
+    ports:
+      - 8005:3000
+    environment:
+      - CODER_ACCESS_URL=http://coder.robotics.lab
+      - CODER_HTTP_ADDRESS=0.0.0.0:3000
+      - CODER_PG_CONNECTION_URL=postgresql://coder:${CODER_DB_PASSWORD}@core-postgres/coder?sslmode=disable
+      - CODER_PROXY_TRUSTED_HEADERS=X-Forwarded-For,X-Forwarded-Proto,X-Forwarded-Host
+      - CODER_OAUTH2_GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - CODER_OAUTH2_GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      - CODER_OAUTH2_GITHUB_ALLOW_SIGNUPS=true
+      - CODER_OAUTH2_GITHUB_ALLOW_EVERYONE=true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    group_add:
+      - "984"
+    networks:
+      - core-data
+
+networks:
+  core-data:
+    external: true

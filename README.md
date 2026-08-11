@@ -94,3 +94,13 @@ sidecar publishes it at `tasks.autonomousrobotics.club` with no inbound
 port opened on the host. Copy `stacks/kaneo/.env.example` to `.env` and
 fill in `KANEO_DB_PASSWORD` (matching `databases/.env`), `AUTH_SECRET`,
 the `S3_*` keys, and `CLOUDFLARE_TUNNEL_TOKEN`.
+
+### Coder
+![Coder](https://img.shields.io/badge/Coder-:8005-000000?logo=coder&logoColor=white)
+
+Cloud dev environments. Migrated off its own bundled `coder-db` onto
+`core-postgres`, matching the main homelab. GitHub OAuth login. At
+`coder.robotics.lab`. Run `scripts/migrate-legacy-stacks.sh` to move data
+over from the legacy `/home/arc/stacks/coder` + `coder-db` setup, then copy
+`stacks/coder/.env.example` to `.env` and fill in `CODER_DB_PASSWORD`
+(matching `databases/.env`), `GITHUB_CLIENT_ID`, and `GITHUB_CLIENT_SECRET`.

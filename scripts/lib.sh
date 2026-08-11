@@ -27,6 +27,14 @@ confirm() {
   esac
 }
 
+container_running() {
+  docker ps --format '{{.Names}}' | grep -qx "$1"
+}
+
+require_container() {
+  container_running "$1" || die "container not running: $1"
+}
+
 ensure_backup_dir() {
   local dir="$1"
   mkdir -p "$dir"

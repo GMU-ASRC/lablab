@@ -101,6 +101,9 @@ columns:
           - title: Dockge
             url: http://docker.robotics.lab
             icon: si:docker
+          - title: Coder
+            url: http://coder.robotics.lab
+            icon: si:visualstudiocode
           - title: Authentik
             url: https://auth.autonomousrobotics.club
             icon: si:authentik

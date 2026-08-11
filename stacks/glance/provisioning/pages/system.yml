@@ -33,3 +33,4 @@ columns:
           - prometheus/prometheus
           - usekaneo/kaneo
           - cloudflare/cloudflared
+          - coder/coder
