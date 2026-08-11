@@ -1,7 +1,8 @@
 # lablab
 
-![Platform](https://img.shields.io/badge/platform-Raspberry%20Pi%205-c51a4a?logo=raspberrypi&logoColor=white)
-![OS](https://img.shields.io/badge/OS-Raspberry%20Pi%20OS-c51a4a?logo=linux&logoColor=white)
+![Platform](https://img.shields.io/badge/platform-KVM%2FQEMU-c51a4a?logo=qemu&logoColor=white)
+![OS](https://img.shields.io/badge/OS-Ubuntu%2024.04-c51a4a?logo=ubuntu&logoColor=white)
+![GPU](https://img.shields.io/badge/GPU-RTX%202080%20Ti-76B900?logo=nvidia&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
 ![Managed by](https://img.shields.io/badge/managed%20by-Dockge-5c00d3?logoColor=white)
 
@@ -17,6 +18,7 @@ model.
 - [Docs.md](Docs.md) - deployment model, services table, per-stack notes.
 - [PORTS.md](PORTS.md) - every published host port and what owns it.
 - [scripts/README.md](scripts/README.md) - the helper scripts (env bootstrap).
+- [docker.md](docker.md) - enabling NVIDIA GPU support in Docker on this host.
 
 ## Stacks
 
@@ -39,9 +41,9 @@ Reverse proxy and SSL termination. Admin UI on `:81`.
 ### Worker
 ![Worker](https://img.shields.io/badge/GPU-required-76B900?logo=nvidia&logoColor=white)
 
-Godot eval worker for astro-swarm. No published ports; needs an NVIDIA GPU
-host, so it does not run on the Pi itself. Copy
-`stacks/worker/.env.example` to `.env` and fill in `API_SECRET_KEY`.
+Godot eval worker for astro-swarm. No published ports; uses the host's
+NVIDIA GPU. Copy `stacks/worker/.env.example` to `.env` and fill in
+`API_SECRET_KEY`.
 
 ### Grafana
 ![Grafana](https://img.shields.io/badge/Grafana-:3300-F46800?logo=grafana&logoColor=white)
@@ -78,6 +80,6 @@ Gitea at `git.sirblob.co`. Copy `stacks/gitea-runner/.env.example` to
 ### Immich
 ![Immich](https://img.shields.io/badge/Immich-:2283-2E7CF6?logo=immich&logoColor=white)
 
-Self-hosted photo library. CPU-only ML (no GPU on the Pi), own Postgres and
-Valkey, not shared with `databases`. Copy `stacks/immich/.env.example` to
-`.env` and fill in `DB_PASSWORD`.
+Self-hosted photo library. GPU-accelerated ML on the host's NVIDIA GPU, own
+Postgres and Valkey, not shared with `databases`. Copy
+`stacks/immich/.env.example` to `.env` and fill in `DB_PASSWORD`.

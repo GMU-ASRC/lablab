@@ -2,12 +2,12 @@ head-widgets:
   - type: server-stats
     servers:
       - type: local
-        name: MochaNet (Pi 5)
+        name: MochaNet (ubuwu24)
         hide-swap: true
         hide-mountpoints-by-default: true
         mountpoints:
           "/":
-            name: "OS (SD Card)"
+            name: "OS Disk"
             hide: false
 
 columns:

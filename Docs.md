@@ -8,21 +8,31 @@ Dockge stack, following the same layout as the main homelab (`docker/`).
 
 - `PORTS.md` - every published host port and what owns it.
 - `scripts/README.md` - the helper scripts (env bootstrap).
+- `docker.md` - enabling NVIDIA GPU support in Docker on this host.
+
+## Host
+
+MochaNet runs on a KVM/QEMU VM (Ubuntu 24.04 x86_64), not a Raspberry Pi,
+with an NVIDIA RTX 2080 Ti passed through. `worker` and `immich` both
+reserve that GPU; a single card is shared between them (see `docker.md`),
+which only risks contention if a heavy eval run and heavy ML processing
+land at the same time.
 
 ## Deployment model
 
-This repo is cloned directly onto the Pi at `/home/arc/lablab`, and that
+This repo is cloned directly onto the host at `/home/arc/lablab`, and that
 checkout **is** the live Dockge stacks directory - there is no separate copy
 or deploy step. Dockge's own stack points `DOCKGE_STACKS_DIR` at
 `/home/arc/lablab/stacks`, and each stack's compose file uses relative binds
 (`./data`, `./provisioning`) that resolve inside its own stack folder.
 
-If the repo is cloned to a different path on the Pi, update the two absolute
-paths in `stacks/dockge/docker-compose.yml` (the bind mount and
+If the repo is cloned to a different path, update the two absolute paths in
+`stacks/dockge/docker-compose.yml` (the bind mount and
 `DOCKGE_STACKS_DIR`) to match.
 
-To deploy a change: edit the files in this repo on the Pi (or `git pull` an
-update pushed from elsewhere), then use Dockge to restart the affected stack.
+To deploy a change: edit the files in this repo on the host (or `git pull`
+an update pushed from elsewhere), then use Dockge to restart the affected
+stack.
 
 ## Services
 
@@ -31,13 +41,13 @@ update pushed from elsewhere), then use Dockge to restart the affected stack.
 | dockge | dockge | louislam/dockge:latest | 5001 | `./data` | Manages all stacks under `stacks/` |
 | glance | glance | glanceapp/glance:latest | 8080 | `./provisioning` | Dashboard config is hand-authored, tracked in git |
 | npm | nginx-proxy-manager | jc21/nginx-proxy-manager:latest | 80, 443, 81 | `./data`, `./letsencrypt` | Reverse proxy and SSL termination |
-| worker | worker | ghcr.io/gmu-asrc/astro-swarm-web-worker:latest | none | `./data` | Godot eval worker, needs an NVIDIA GPU host |
+| worker | worker | ghcr.io/gmu-asrc/astro-swarm-web-worker:latest | none | `./data` | Godot eval worker, GPU-accelerated (RTX 2080 Ti) |
 | grafana | grafana | grafana/grafana:latest | 3300 | `./data`, `./provisioning` | Dashboards, Netbird VPN only |
 | prometheus | prometheus, node-exporter | prom/prometheus:latest, prom/node-exporter:latest | 9090, host (9100) | `./data` | Metrics feeding grafana, Netbird VPN only |
 | ftp | ftp | stilliard/pure-ftpd:latest | 2121, 30000-30009 | `./data`, `./config` | FTPS (TLS enforced), single admin user |
 | databases | core-postgres, core-valkey | postgres:16, valkey/valkey:8-bookworm | none | `./data` | Shared datastore for future stacks, see below |
 | gitea-runner | gitea-runner | gitea/act_runner:latest | none | `./data` | Registers against git.sirblob.co, no local Gitea |
-| immich | immich_server, immich_machine_learning, immich_redis, immich_postgres | ghcr.io/immich-app/immich-server, immich-machine-learning, valkey, immich-app/postgres | 2283 | `./data` | Photo library, CPU-only ML (no GPU on the Pi) |
+| immich | immich_server, immich_machine_learning, immich_redis, immich_postgres | ghcr.io/immich-app/immich-server, immich-machine-learning, valkey, immich-app/postgres | 2283 | `./data` | Photo library, GPU-accelerated ML (RTX 2080 Ti) |
 
 No stack here currently requires a database. `databases` exists so a future
 app can reuse a shared Postgres/Valkey instead of bundling its own, the same
@@ -126,7 +136,7 @@ gitea-runner, `DB_PASSWORD` for immich). `.env` files are gitignored.
   homelab tracks Grafana's `provisioning/` folder. It mounts to `/app/config`
   inside the container. Also gets the docker socket (read-only) so the
   `docker-containers` widget can show container status, and the host
-  timezone files so the clock widget matches the Pi.
+  timezone files so the clock widget matches the host.
 - **npm:** `./data` and `./letsencrypt` hold NPM's own database and
   certificates. Both are runtime state, not config-as-code, so they are
   gitignored. Admin UI is on port `81`; ports `80`/`443` are the public
@@ -134,10 +144,11 @@ gitea-runner, `DB_PASSWORD` for immich). `.env` files are gitignored.
 - **worker:** Pulls a Godot dedicated-server build and runs simulation
   evals for the `astroswarm.autonomousrobotics.club` server, reporting
   results back over `SERVER_URL`. Reserves one NVIDIA GPU via
-  `deploy.resources.reservations.devices`, so this stack cannot run on the
-  Pi itself - point Dockge's stacks dir at a GPU-equipped host, or run this
-  one manually on that host with the same compose file. `WORKER_MAX_JOBS`
-  and `EVAL_SHARD_COUNT` should be tuned per machine.
+  `deploy.resources.reservations.devices` (the host's RTX 2080 Ti, see
+  `docker.md` for the container toolkit setup this needs). `WORKER_MAX_JOBS`
+  and `EVAL_SHARD_COUNT` should be tuned to what the GPU and CPU can
+  actually sustain, especially since `immich`'s machine-learning container
+  shares the same card.
 - **grafana:** Runs as uid/gid `472`, so a one-shot `grafana-init` container
   `chown`s `./data` to `472` before the server starts. `provisioning/` holds
   the datasource config and is tracked in git, the same pattern as
@@ -183,15 +194,15 @@ gitea-runner, `DB_PASSWORD` for immich). `.env` files are gitignored.
 - **immich:** Deliberately separate from `databases`, same as the main
   homelab: its Postgres image (`vectorchord`/`pgvectors`) is required for
   its data and cannot be replaced by plain `postgres:16`, and its own
-  Valkey is bundled rather than shared. Unlike the main homelab's GPU
-  build, this uses the default (CPU) `immich-machine-learning` image with
-  no `deploy.resources.reservations.devices` block, since the Pi has no
-  NVIDIA GPU; ML tasks (face/object detection) just run slower. `./data/upload`
-  is the photo library, `./data/postgres` is the database, both bind mounts
-  on the Pi's own disk, so the "Postgres must be on local disk, not a
-  network share" rule from the main homelab is satisfied automatically
-  here. `model-cache` stays a plain named volume, it is re-downloadable ML
-  model data, not worth tracking as a bind mount.
+  Valkey is bundled rather than shared. Uses the `-cuda` tag of
+  `immich-machine-learning` plus a `deploy.resources.reservations.devices`
+  block on both `immich-server` and `immich-machine-learning`, same pattern
+  as the main homelab, since this host has an NVIDIA GPU (see `docker.md`).
+  `./data/upload` is the photo library, `./data/postgres` is the database,
+  both bind mounts on the host's own local disk, so the "Postgres must be
+  on local disk, not a network share" rule from the main homelab is
+  satisfied automatically here. `model-cache` stays a plain named volume,
+  it is re-downloadable ML model data, not worth tracking as a bind mount.
 
 ## Maintenance
 

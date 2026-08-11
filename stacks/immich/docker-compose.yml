@@ -9,6 +9,17 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_DATABASE_NAME=${DB_DATABASE_NAME}
       - REDIS_HOSTNAME=immich_redis
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities:
+                - gpu
+                - compute
+                - video
+                - utility
     volumes:
       - ./data/upload:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
@@ -25,7 +36,18 @@ services:
 
   immich-machine-learning:
     container_name: immich_machine_learning
-    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
+    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}-cuda
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities:
+                - gpu
+                - compute
+                - video
+                - utility
     volumes:
       - model-cache:/cache
     env_file:
