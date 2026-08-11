@@ -160,11 +160,13 @@ must match, same pattern as the main homelab's shared-database passwords:
   `docker-containers` widget can show container status, and the host
   timezone files so the clock widget matches the host. The bookmarks and
   monitor widgets in `pages/dashboard.yml` link to `grafana.robotics.lab`,
-  `immich.robotics.lab` (immich), `prometheus.robotics.lab`, and
-  `npm.robotics.lab:81` (NPM's own admin UI, direct port since NPM can't
-  proxy itself) alongside the existing `.robotics.lab` entries; all four
-  are naming intent, not yet backed by an NPM proxy host or Netbird DNS
-  entry, add those before expecting the links to resolve.
+  `immich.robotics.lab` (immich), and `npm.robotics.lab:81` (NPM's own
+  admin UI, direct port since NPM can't proxy itself) alongside the
+  existing `.robotics.lab` entries; all three are naming intent, not yet
+  backed by an NPM proxy host or Netbird DNS entry, add those before
+  expecting the links to resolve. `prometheus` is deliberately not linked
+  from the dashboard; it is still tracked in `pages/system.yml`'s release
+  widget.
   `tasks.autonomousrobotics.club` (kaneo) is the same situation but via
   Cloudflare Tunnel's Public Hostname config instead of NPM, see the
   `kaneo` note below. `pages/system.yml`'s release tracker follows

@@ -93,9 +93,6 @@ columns:
               - title: Immich
                 url: "http://immich.robotics.lab"
                 icon: "si:immich"
-              - title: Prometheus
-                url: "http://prometheus.robotics.lab"
-                icon: "si:prometheus"
               - title: NPM
                 url: "http://npm.robotics.lab:81"
                 icon: "si:nginx"
@@ -131,9 +128,6 @@ columns:
           - title: Kaneo
             url: https://tasks.autonomousrobotics.club
             icon: si:kaneo
-          - title: Prometheus
-            url: http://prometheus.robotics.lab
-            icon: si:prometheus
           - title: NPM
             url: http://npm.robotics.lab:81
             icon: si:nginx
