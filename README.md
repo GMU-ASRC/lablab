@@ -58,3 +58,11 @@ Metrics collector, plus `node-exporter` for host metrics. Netbird VPN only.
 
 FTPS only (plaintext FTP refused). Copy `stacks/ftp/.env.example` to `.env`
 and set `FTP_PUBLIC_HOST` to the host's real reachable address.
+
+### Databases
+![Postgres](https://img.shields.io/badge/Postgres-core--postgres-336791?logo=postgresql&logoColor=white)
+![Valkey](https://img.shields.io/badge/Valkey-core--valkey-DC382D?logo=redis&logoColor=white)
+
+Shared Postgres/Valkey for future stacks to reuse instead of bundling their
+own database. No host ports; nothing uses it yet. See `Docs.md` for how to
+add a stack to it.

@@ -34,9 +34,60 @@ update pushed from elsewhere), then use Dockge to restart the affected stack.
 | grafana | grafana | grafana/grafana:latest | 3300 | `./data`, `./provisioning` | Dashboards, Netbird VPN only |
 | prometheus | prometheus, node-exporter | prom/prometheus:latest, prom/node-exporter:latest | 9090, host (9100) | `./data` | Metrics feeding grafana, Netbird VPN only |
 | ftp | ftp | stilliard/pure-ftpd:latest | 2121, 30000-30009 | `./data`, `./config` | FTPS (TLS enforced), single admin user |
+| databases | core-postgres, core-valkey | postgres:16, valkey/valkey:8-bookworm | none | `./data` | Shared datastore for future stacks, see below |
 
-None of these services need a database, so there is no shared datastore stack
-here (unlike the main homelab's `core-postgres`/`core-valkey`).
+No stack here currently requires a database. `databases` exists so a future
+app can reuse a shared Postgres/Valkey instead of bundling its own, the same
+model as the main homelab's `core-postgres`/`core-valkey`. `grafana` could
+point at it (`GF_DATABASE_*` env vars) instead of its embedded SQLite, but
+the main homelab deliberately leaves Grafana on SQLite too (same reasoning
+as `archivebox` there: a single lightweight dashboard app gets nothing from
+an external database), so lablab's `grafana` stays on SQLite by default as
+well.
+
+## The `core-data` network
+
+`databases` and any stack that uses it need to reach each other by
+container name, so they share an external network. Create it once on the
+host:
+
+```
+docker network create core-data
+```
+
+Each consuming stack declares it as external:
+
+```yaml
+networks:
+  core-data:
+    external: true
+```
+
+Reach the datastores by container name: `core-postgres` and `core-valkey`.
+Start the `databases` stack, and wait until `core-postgres` is healthy,
+before starting anything that depends on it.
+
+### If a stack needs a database
+
+Attach it to `core-data`, then create a role and database by hand:
+
+```
+docker exec -it core-postgres psql -U postgres \
+  -c "CREATE ROLE myapp LOGIN PASSWORD 'change_me';" \
+  -c "CREATE DATABASE myapp OWNER myapp;"
+```
+
+```yaml
+services:
+  myapp:
+    environment:
+      - DATABASE_URL=postgresql://myapp:change_me@core-postgres:5432/myapp
+    networks:
+      - core-data
+networks:
+  core-data:
+    external: true
+```
 
 ## The `monitoring-net` network
 
@@ -55,10 +106,11 @@ provisioned datasource in
 
 ## Secrets and `.env`
 
-`worker`, `grafana`, and `ftp` need secrets. Each has an `.env.example`
-template; copy it to `.env` and fill in real values (`API_SECRET_KEY` for
-worker, `GRAFANA_ADMIN_USER`/`GRAFANA_ADMIN_PASSWORD` for grafana,
-`FTP_PUBLIC_HOST`/`FTP_USER_PASS` for ftp). `.env` files are gitignored.
+`worker`, `grafana`, `ftp`, and `databases` need secrets. Each has an
+`.env.example` template; copy it to `.env` and fill in real values
+(`API_SECRET_KEY` for worker, `GRAFANA_ADMIN_USER`/`GRAFANA_ADMIN_PASSWORD`
+for grafana, `FTP_PUBLIC_HOST`/`FTP_USER_PASS` for ftp,
+`POSTGRES_PASSWORD` for databases). `.env` files are gitignored.
 
 ## Per-stack notes
 
@@ -110,9 +162,14 @@ worker, `GRAFANA_ADMIN_USER`/`GRAFANA_ADMIN_PASSWORD` for grafana,
   Passive ports `30000-30009` must stay open alongside `2121`. `./data` is
   the FTP root, `./config/pureftpd` holds the virtual-user password
   database.
+- **databases:** `core-postgres` and `core-valkey`, no host ports; reachable
+  only over `core-data`. No stack here uses it yet, see "If a stack needs a
+  database" above for how to add one.
 
 ## Maintenance
 
 - Validate any edited stack with `docker compose config` before starting it.
 - Back up `stacks/npm/data` and `stacks/npm/letsencrypt` before making proxy
   changes; losing them means reconfiguring every proxy host and cert.
+- Back up `stacks/databases/data` before changing anything in that stack,
+  once a real app depends on it.
