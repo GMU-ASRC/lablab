@@ -74,3 +74,10 @@ add a stack to it.
 No local Gitea, just a CI runner that registers against the main homelab's
 Gitea at `git.sirblob.co`. Copy `stacks/gitea-runner/.env.example` to
 `.env` and paste in a registration token generated on that instance.
+
+### Immich
+![Immich](https://img.shields.io/badge/Immich-:2283-2E7CF6?logo=immich&logoColor=white)
+
+Self-hosted photo library. CPU-only ML (no GPU on the Pi), own Postgres and
+Valkey, not shared with `databases`. Copy `stacks/immich/.env.example` to
+`.env` and fill in `DB_PASSWORD`.

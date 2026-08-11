@@ -37,6 +37,7 @@ update pushed from elsewhere), then use Dockge to restart the affected stack.
 | ftp | ftp | stilliard/pure-ftpd:latest | 2121, 30000-30009 | `./data`, `./config` | FTPS (TLS enforced), single admin user |
 | databases | core-postgres, core-valkey | postgres:16, valkey/valkey:8-bookworm | none | `./data` | Shared datastore for future stacks, see below |
 | gitea-runner | gitea-runner | gitea/act_runner:latest | none | `./data` | Registers against git.sirblob.co, no local Gitea |
+| immich | immich_server, immich_machine_learning, immich_redis, immich_postgres | ghcr.io/immich-app/immich-server, immich-machine-learning, valkey, immich-app/postgres | 2283 | `./data` | Photo library, CPU-only ML (no GPU on the Pi) |
 
 No stack here currently requires a database. `databases` exists so a future
 app can reuse a shared Postgres/Valkey instead of bundling its own, the same
@@ -108,12 +109,12 @@ provisioned datasource in
 
 ## Secrets and `.env`
 
-`worker`, `grafana`, `ftp`, `databases`, and `gitea-runner` need secrets.
-Each has an `.env.example` template; copy it to `.env` and fill in real
-values (`API_SECRET_KEY` for worker, `GRAFANA_ADMIN_USER`/
+`worker`, `grafana`, `ftp`, `databases`, `gitea-runner`, and `immich` need
+secrets. Each has an `.env.example` template; copy it to `.env` and fill in
+real values (`API_SECRET_KEY` for worker, `GRAFANA_ADMIN_USER`/
 `GRAFANA_ADMIN_PASSWORD` for grafana, `FTP_PUBLIC_HOST`/`FTP_USER_PASS` for
 ftp, `POSTGRES_PASSWORD` for databases, `GITEA_RUNNER_TOKEN` for
-gitea-runner). `.env` files are gitignored.
+gitea-runner, `DB_PASSWORD` for immich). `.env` files are gitignored.
 
 ## Per-stack notes
 
@@ -179,6 +180,18 @@ gitea-runner). `.env` files are gitignored.
   host` needed here (unlike the main homelab's runner, which reaches its
   Gitea over `localhost`); this one only needs outbound HTTPS to
   `git.sirblob.co`.
+- **immich:** Deliberately separate from `databases`, same as the main
+  homelab: its Postgres image (`vectorchord`/`pgvectors`) is required for
+  its data and cannot be replaced by plain `postgres:16`, and its own
+  Valkey is bundled rather than shared. Unlike the main homelab's GPU
+  build, this uses the default (CPU) `immich-machine-learning` image with
+  no `deploy.resources.reservations.devices` block, since the Pi has no
+  NVIDIA GPU; ML tasks (face/object detection) just run slower. `./data/upload`
+  is the photo library, `./data/postgres` is the database, both bind mounts
+  on the Pi's own disk, so the "Postgres must be on local disk, not a
+  network share" rule from the main homelab is satisfied automatically
+  here. `model-cache` stays a plain named volume, it is re-downloadable ML
+  model data, not worth tracking as a bind mount.
 
 ## Maintenance
 
@@ -187,3 +200,5 @@ gitea-runner). `.env` files are gitignored.
   changes; losing them means reconfiguring every proxy host and cert.
 - Back up `stacks/databases/data` before changing anything in that stack,
   once a real app depends on it.
+- Back up `stacks/immich/data/upload` and `stacks/immich/data/postgres`
+  regularly; the photo library is not reproducible if lost.
