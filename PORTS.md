@@ -11,6 +11,12 @@ container port it maps to. Use this to avoid collisions when adding services.
 | 5001 | tcp | dockge | dockge | 5001 | Dockge UI |
 | 8080 | tcp | glance | glance | 8080 | Glance dashboard |
 
+## Internal-only (no host port)
+
+| Stack | Service / container | Notes |
+| --- | --- | --- |
+| worker | worker | Outbound only, reports to `SERVER_URL` |
+
 ## Conflicts and reminders
 
 - New services proxied through NPM only need a single internal/web port;

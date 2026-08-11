@@ -30,9 +30,16 @@ update pushed from elsewhere), then use Dockge to restart the affected stack.
 | dockge | dockge | louislam/dockge:latest | 5001 | `./data` | Manages all stacks under `stacks/` |
 | glance | glance | glanceapp/glance:latest | 8080 | `./provisioning` | Dashboard config is hand-authored, tracked in git |
 | npm | nginx-proxy-manager | jc21/nginx-proxy-manager:latest | 80, 443, 81 | `./data`, `./letsencrypt` | Reverse proxy and SSL termination |
+| worker | worker | ghcr.io/gmu-asrc/astro-swarm-web-worker:latest | none | `./data` | Godot eval worker, needs an NVIDIA GPU host |
 
 None of these services need a database, so there is no shared datastore stack
 here (unlike the main homelab's `core-postgres`/`core-valkey`).
+
+## Secrets and `.env`
+
+`worker` is the first stack here that needs secrets. It has an `.env.example`
+template; copy it to `.env` and fill in the real `API_SECRET_KEY`. `.env`
+files are gitignored.
 
 ## Per-stack notes
 
@@ -49,6 +56,13 @@ here (unlike the main homelab's `core-postgres`/`core-valkey`).
   certificates. Both are runtime state, not config-as-code, so they are
   gitignored. Admin UI is on port `81`; ports `80`/`443` are the public
   reverse proxy.
+- **worker:** Pulls a Godot dedicated-server build and runs simulation
+  evals for the `astroswarm.autonomousrobotics.club` server, reporting
+  results back over `SERVER_URL`. Reserves one NVIDIA GPU via
+  `deploy.resources.reservations.devices`, so this stack cannot run on the
+  Pi itself - point Dockge's stacks dir at a GPU-equipped host, or run this
+  one manually on that host with the same compose file. `WORKER_MAX_JOBS`
+  and `EVAL_SHARD_COUNT` should be tuned per machine.
 
 ## Maintenance
 

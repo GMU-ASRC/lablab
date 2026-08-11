@@ -1,0 +1,26 @@
+services:
+  worker:
+    image: ghcr.io/gmu-asrc/astro-swarm-web-worker:latest
+    container_name: worker
+    restart: unless-stopped
+    environment:
+      SERVER_URL: ${WORKER_SERVER_URL:-http://server:5050}
+      API_SECRET_KEY: ${API_SECRET_KEY}
+      WORKER_NAME: ${WORKER_NAME:-worker}
+      WORKER_MAX_JOBS: ${WORKER_MAX_JOBS:-4}
+      GODOT_RELEASE_TAG: ${GODOT_RELEASE_TAG:-latest}
+      GODOT_SERVER_BIN: ${GODOT_SERVER_BIN:-}
+      GODOT_PCK: ${GODOT_PCK:-}
+      EVAL_TIMEOUT_SECONDS: ${EVAL_TIMEOUT_SECONDS:-1800}
+      EVAL_FIXED_FPS: ${EVAL_FIXED_FPS:-60}
+      EVAL_SHARD_COUNT: ${EVAL_SHARD_COUNT:-32}
+    volumes:
+      - ./data:/data
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities:
+                - gpu

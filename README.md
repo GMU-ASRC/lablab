@@ -34,3 +34,10 @@ Config lives at `stacks/glance/provisioning`.
 ![NPM](https://img.shields.io/badge/NPM-:80%20%2F%20:443-F15833?logo=nginx&logoColor=white)
 
 Reverse proxy and SSL termination. Admin UI on `:81`.
+
+### Worker
+![Worker](https://img.shields.io/badge/GPU-required-76B900?logo=nvidia&logoColor=white)
+
+Godot eval worker for astro-swarm. No published ports; needs an NVIDIA GPU
+host, so it does not run on the Pi itself. Copy
+`stacks/worker/.env.example` to `.env` and fill in `API_SECRET_KEY`.
