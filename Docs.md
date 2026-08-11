@@ -136,7 +136,8 @@ has an `.env.example` template; copy it to `.env` and fill in real values
 for grafana, `FTP_PUBLIC_HOST`/`FTP_USER_PASS` for ftp, `POSTGRES_PASSWORD`
 for databases, `GITEA_RUNNER_TOKEN` for gitea-runner, `DB_PASSWORD` for
 immich, `AUTH_SECRET`/`S3_ACCESS_KEY_ID`/`S3_SECRET_ACCESS_KEY`/
-`AUTHENTIK_CLIENT_ID`/`AUTHENTIK_CLIENT_SECRET` for kaneo,
+`AUTHENTIK_CLIENT_ID`/`AUTHENTIK_CLIENT_SECRET`/`GITHUB_APP_ID`/
+`GITHUB_WEBHOOK_SECRET`/`GITHUB_PRIVATE_KEY` for kaneo,
 `GITHUB_CLIENT_ID`/`GITHUB_CLIENT_SECRET` for coder). `.env` files are
 gitignored.
 
@@ -275,7 +276,17 @@ must match, same pattern as the main homelab's shared-database passwords:
   login, it does not replace it: `CUSTOM_OAUTH_AUTO_LOGIN` and
   `DISABLE_LOGIN_FORM` are deliberately left unset, Kaneo's own docs warn
   that enabling either on an existing installation can lock out local
-  accounts with unverified email addresses.
+  accounts with unverified email addresses. Repository sync/webhooks are
+  separate from login: a GitHub App (not the GitHub OAuth App used for
+  sign-in elsewhere in this repo) provides `GITHUB_APP_ID`,
+  `GITHUB_WEBHOOK_SECRET`, and a PEM private key. Set the PEM as
+  `GITHUB_PRIVATE_KEY` with real newlines replaced by literal `\n`
+  characters (the portable form Kaneo's docs recommend for plain `.env`
+  files), or base64-encode it into `GITHUB_PRIVATE_KEY_BASE64` instead,
+  which takes precedence if both are set. `GITHUB_APP_NAME` is optional,
+  only used for installation links in Kaneo's UI. This whole block is
+  optional; leaving all five unset just leaves GitHub repo sync/webhooks
+  off.
 - **coder:** Migrated off its own bundled `coder-db` (`postgres:15`) onto
   the shared `core-postgres`, same as the main homelab's `coder` stack;
   `CODER_DB_PASSWORD` must match `databases/.env`. `scripts/migrate-legacy-stacks.sh`

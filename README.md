@@ -93,10 +93,13 @@ existing RustFS bucket for uploads instead of a new MinIO. A `cloudflared`
 sidecar publishes it at `tasks.autonomousrobotics.club` with no inbound
 port opened on the host. Login supports Authentik SSO (via Custom
 OAuth/OIDC) alongside Kaneo's own email/password login, not instead of it.
-Copy `stacks/kaneo/.env.example` to `.env` and fill in `KANEO_DB_PASSWORD`
-(matching `databases/.env`), `AUTH_SECRET`, the `S3_*` keys,
-`CLOUDFLARE_TUNNEL_TOKEN`, and `AUTHENTIK_CLIENT_ID`/
-`AUTHENTIK_CLIENT_SECRET` once that Application exists in Authentik.
+GitHub repo sync/webhooks (a GitHub App, separate from login) are
+optional, leave `GITHUB_APP_ID`/`GITHUB_WEBHOOK_SECRET`/
+`GITHUB_PRIVATE_KEY` unset to skip them. Copy `stacks/kaneo/.env.example`
+to `.env` and fill in `KANEO_DB_PASSWORD` (matching `databases/.env`),
+`AUTH_SECRET`, the `S3_*` keys, `CLOUDFLARE_TUNNEL_TOKEN`, and
+`AUTHENTIK_CLIENT_ID`/`AUTHENTIK_CLIENT_SECRET` once that Application
+exists in Authentik.
 
 ### Coder
 ![Coder](https://img.shields.io/badge/Coder-:8005-000000?logo=coder&logoColor=white)
