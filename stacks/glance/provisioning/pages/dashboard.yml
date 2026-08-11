@@ -48,7 +48,7 @@ columns:
           - name: CREATE LAB
             links:
               - title: GitHub
-                url: "https://github.com/ARC-GMU"
+                url: "https://github.com/GMU-ASRC"
                 icon: "si:github"
               - title: Lab Website
                 url: "https://create.autonomousrobotics.club/"
@@ -134,7 +134,7 @@ columns:
         title: Project Updates
         cache: 6h
         repositories:
-          - ARC-GMU
+          - GMU-ASRC
           - glanceapp/glance
           - go-gitea/gitea
           - ros2/ros2
