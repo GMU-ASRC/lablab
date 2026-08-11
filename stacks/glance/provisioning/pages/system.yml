@@ -31,3 +31,5 @@ columns:
           - NginxProxyManager/nginx-proxy-manager
           - grafana/grafana
           - prometheus/prometheus
+          - usekaneo/kaneo
+          - cloudflare/cloudflared

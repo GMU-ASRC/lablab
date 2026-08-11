@@ -48,12 +48,14 @@ stack.
 | databases | core-postgres, core-valkey | postgres:16, valkey/valkey:8-bookworm | none | `./data` | Shared datastore for future stacks, see below |
 | gitea-runner | gitea-runner | gitea/act_runner:latest | none | `./data` | Registers against git.sirblob.co, no local Gitea |
 | immich | immich_server, immich_machine_learning, immich_redis, immich_postgres | ghcr.io/immich-app/immich-server, immich-machine-learning, valkey, immich-app/postgres | 2283 | `./data` | Photo library, GPU-accelerated ML (RTX 2080 Ti) |
+| kaneo | kaneo, kaneo-cloudflared | ghcr.io/usekaneo/kaneo:latest, cloudflare/cloudflared:latest | 5173 | none | Task tracker, uses `core-postgres`, public via Cloudflare Tunnel |
 
-No stack here currently requires a database. `databases` exists so a future
-app can reuse a shared Postgres/Valkey instead of bundling its own, the same
-model as the main homelab's `core-postgres`/`core-valkey`. `grafana` could
-point at it (`GF_DATABASE_*` env vars) instead of its embedded SQLite, but
-the main homelab deliberately leaves Grafana on SQLite too (same reasoning
+`kaneo` is the first stack that actually reuses `databases`: instead of
+bundling its own Postgres like the upstream Kaneo docs show, it points
+`DATABASE_URL` at `core-postgres` and gets a `kaneo` role/database from
+`stacks/databases/init/01-init-databases.sh`. `grafana` could point at
+`databases` too (`GF_DATABASE_*` env vars) instead of its embedded SQLite,
+but the main homelab deliberately leaves Grafana on SQLite (same reasoning
 as `archivebox` there: a single lightweight dashboard app gets nothing from
 an external database), so lablab's `grafana` stays on SQLite by default as
 well.
@@ -78,11 +80,19 @@ networks:
 
 Reach the datastores by container name: `core-postgres` and `core-valkey`.
 Start the `databases` stack, and wait until `core-postgres` is healthy,
-before starting anything that depends on it.
+before starting anything that depends on it. Dockge stacks are independent,
+so `depends_on` cannot cross stacks the way `kaneo`'s compose file might
+suggest, that ordering has to be done by hand: start `databases` first,
+every time.
 
 ### If a stack needs a database
 
-Attach it to `core-data`, then create a role and database by hand:
+`databases/init/01-init-databases.sh` creates a role and database
+automatically, but **only on a fresh Postgres data directory**. It already
+covers `kaneo`; add a new `create_role_and_db` line there (and the matching
+password in `databases/.env`) before that stack's first-ever start. On an
+existing data directory the init script does nothing, so a role/database
+added later has to be created by hand instead:
 
 ```
 docker exec -it core-postgres psql -U postgres \
@@ -119,12 +129,20 @@ provisioned datasource in
 
 ## Secrets and `.env`
 
-`worker`, `grafana`, `ftp`, `databases`, `gitea-runner`, and `immich` need
-secrets. Each has an `.env.example` template; copy it to `.env` and fill in
-real values (`API_SECRET_KEY` for worker, `GRAFANA_ADMIN_USER`/
-`GRAFANA_ADMIN_PASSWORD` for grafana, `FTP_PUBLIC_HOST`/`FTP_USER_PASS` for
-ftp, `POSTGRES_PASSWORD` for databases, `GITEA_RUNNER_TOKEN` for
-gitea-runner, `DB_PASSWORD` for immich). `.env` files are gitignored.
+Every stack except `dockge`, `glance`, and `prometheus` needs secrets. Each
+has an `.env.example` template; copy it to `.env` and fill in real values
+(`API_SECRET_KEY` for worker, `GRAFANA_ADMIN_USER`/`GRAFANA_ADMIN_PASSWORD`
+for grafana, `FTP_PUBLIC_HOST`/`FTP_USER_PASS` for ftp, `POSTGRES_PASSWORD`
+for databases, `GITEA_RUNNER_TOKEN` for gitea-runner, `DB_PASSWORD` for
+immich, `AUTH_SECRET`/`S3_ACCESS_KEY_ID`/`S3_SECRET_ACCESS_KEY` for kaneo).
+`.env` files are gitignored.
+
+`KANEO_DB_PASSWORD` is set in two places and must match, same pattern as
+the main homelab's shared-database passwords:
+
+| Variable | Set in | Must match |
+| --- | --- | --- |
+| `KANEO_DB_PASSWORD` | `databases/.env`, `kaneo/.env` | kaneo role |
 
 ## Per-stack notes
 
@@ -141,8 +159,11 @@ gitea-runner, `DB_PASSWORD` for immich). `.env` files are gitignored.
   and `photos.robotics.lab` (immich) alongside the existing `.robotics.lab`
   entries; those two are naming intent, not yet backed by an NPM proxy
   host or Netbird DNS entry, add those before expecting the links to
-  resolve. `pages/system.yml`'s release tracker follows what is actually
-  deployed here, so keep it in sync when adding or removing a stack.
+  resolve. `tasks.autonomousrobotics.club` (kaneo) is the same situation
+  but via Cloudflare Tunnel's Public Hostname config instead of NPM, see
+  the `kaneo` note below. `pages/system.yml`'s release tracker follows
+  what is actually deployed here, so keep it in sync when adding or
+  removing a stack.
 - **npm:** `./data` and `./letsencrypt` hold NPM's own database and
   certificates. Both are runtime state, not config-as-code, so they are
   gitignored. Admin UI is on port `81`; ports `80`/`443` are the public
@@ -212,6 +233,25 @@ gitea-runner, `DB_PASSWORD` for immich). `.env` files are gitignored.
   `glance` links to it at `photos.robotics.lab`, an NPM proxy host to
   `2283` and a Netbird DNS entry for that hostname still need setting up,
   see the `glance` note above.
+- **kaneo:** Task tracker. No bundled Postgres, unlike the upstream Kaneo
+  compose docs, `DATABASE_URL` points at the shared `core-postgres`
+  instead (see "If a stack needs a database" above); `KANEO_DB_PASSWORD`
+  must match `databases/.env`. `AUTH_SECRET` is generated with
+  `openssl rand -hex 32`, not left as a placeholder. Object storage for
+  task-description/comment uploads points at the existing RustFS S3
+  bucket at `bucket.autonomousrobotics.club` (`S3_*` vars) rather than a
+  new MinIO container; the `kaneo-uploads` bucket and its access key still
+  need creating on that RustFS instance, that is a manual step on the main
+  homelab, not something this repo can do. Reachable two ways: directly on
+  host port `5173`, and publicly via the `cloudflared` sidecar, a
+  Cloudflare Tunnel client with no inbound port of its own, reaching
+  `kaneo` over `core-data` at `kaneo:5173`. `CLOUDFLARE_TUNNEL_TOKEN`
+  comes from Cloudflare Zero Trust -> Networks -> Tunnels -> Create a
+  tunnel (Docker connector); the tunnel's Public Hostname still needs
+  pointing at `kaneo:5173` in that same dashboard, and
+  `tasks.autonomousrobotics.club` needs adding as the public hostname, both
+  external to this repo. `KANEO_CLIENT_URL` is set to that hostname so the
+  app generates correct links once the tunnel is live.
 
 ## Maintenance
 

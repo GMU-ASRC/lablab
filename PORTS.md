@@ -12,6 +12,7 @@ container port it maps to. Use this to avoid collisions when adding services.
 | 2283 | tcp | immich | immich_server | 2283 | Immich web/API |
 | 3300 | tcp | grafana | grafana | 3000 | Grafana web (Netbird VPN only, grafana.robotics.lab) |
 | 5001 | tcp | dockge | dockge | 5001 | Dockge UI |
+| 5173 | tcp | kaneo | kaneo | 5173 | Kaneo web (also public via Cloudflare Tunnel) |
 | 8080 | tcp | glance | glance | 8080 | Glance dashboard |
 | 9090 | tcp | prometheus | prometheus | 9090 | Prometheus UI/API (Netbird VPN only) |
 | 30000-30009 | tcp | ftp | ftp | 30000-30009 | FTP passive port range |
@@ -36,6 +37,7 @@ host (no `-p` mapping) and are not in the table above.
 | immich | immich_postgres | Port 5432, default network |
 | immich | immich_redis | Port 6379, default network |
 | immich | immich_machine_learning | Port 3003, default network |
+| kaneo | kaneo-cloudflared | Outbound only, Cloudflare Tunnel to tasks.autonomousrobotics.club |
 
 ## Conflicts and reminders
 

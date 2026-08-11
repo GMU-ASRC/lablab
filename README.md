@@ -83,3 +83,14 @@ Gitea at `git.sirblob.co`. Copy `stacks/gitea-runner/.env.example` to
 Self-hosted photo library. GPU-accelerated ML on the host's NVIDIA GPU, own
 Postgres and Valkey, not shared with `databases`. Copy
 `stacks/immich/.env.example` to `.env` and fill in `DB_PASSWORD`.
+
+### Kaneo
+![Kaneo](https://img.shields.io/badge/Kaneo-:5173-6366F1?logoColor=white)
+![Cloudflare Tunnel](https://img.shields.io/badge/public%20via-Cloudflare%20Tunnel-F38020?logo=cloudflare&logoColor=white)
+
+Task tracker. Uses `core-postgres` instead of a bundled Postgres, and the
+existing RustFS bucket for uploads instead of a new MinIO. A `cloudflared`
+sidecar publishes it at `tasks.autonomousrobotics.club` with no inbound
+port opened on the host. Copy `stacks/kaneo/.env.example` to `.env` and
+fill in `KANEO_DB_PASSWORD` (matching `databases/.env`), `AUTH_SECRET`,
+the `S3_*` keys, and `CLOUDFLARE_TUNNEL_TOKEN`.

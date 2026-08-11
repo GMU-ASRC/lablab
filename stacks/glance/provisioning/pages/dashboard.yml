@@ -73,6 +73,9 @@ columns:
               - title: Gitea
                 url: "https://git.sirblob.co"
                 icon: "si:gitea"
+              - title: Kaneo
+                url: "https://tasks.autonomousrobotics.club"
+                icon: "si:kaneo"
           - name: Infrastructure
             links:
               - title: Authentik
@@ -116,6 +119,9 @@ columns:
           - title: Immich
             url: http://photos.robotics.lab
             icon: si:immich
+          - title: Kaneo
+            url: https://tasks.autonomousrobotics.club
+            icon: si:kaneo
 
   - size: small
     widgets:
