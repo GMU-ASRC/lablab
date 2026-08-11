@@ -41,3 +41,14 @@ Reverse proxy and SSL termination. Admin UI on `:81`.
 Godot eval worker for astro-swarm. No published ports; needs an NVIDIA GPU
 host, so it does not run on the Pi itself. Copy
 `stacks/worker/.env.example` to `.env` and fill in `API_SECRET_KEY`.
+
+### Grafana
+![Grafana](https://img.shields.io/badge/Grafana-:3300-F46800?logo=grafana&logoColor=white)
+
+Dashboards fed by Prometheus. Netbird VPN only, at `grafana.robotics.lab`.
+Copy `stacks/grafana/.env.example` to `.env` and fill in admin credentials.
+
+### Prometheus
+![Prometheus](https://img.shields.io/badge/Prometheus-:9090-E6522C?logo=prometheus&logoColor=white)
+
+Metrics collector, plus `node-exporter` for host metrics. Netbird VPN only.

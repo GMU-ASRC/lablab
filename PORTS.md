@@ -8,8 +8,19 @@ container port it maps to. Use this to avoid collisions when adding services.
 | 80 | tcp | npm | nginx-proxy-manager | 80 | Public HTTP |
 | 81 | tcp | npm | nginx-proxy-manager | 81 | Admin Web UI |
 | 443 | tcp | npm | nginx-proxy-manager | 443 | Public HTTPS |
+| 3300 | tcp | grafana | grafana | 3000 | Grafana web (Netbird VPN only, grafana.robotics.lab) |
 | 5001 | tcp | dockge | dockge | 5001 | Dockge UI |
 | 8080 | tcp | glance | glance | 8080 | Glance dashboard |
+| 9090 | tcp | prometheus | prometheus | 9090 | Prometheus UI/API (Netbird VPN only) |
+
+## Host-network services
+
+These use `network_mode: host`, so they bind their ports directly on the
+host (no `-p` mapping) and are not in the table above.
+
+| Stack | Service | Key ports | Notes |
+| --- | --- | --- | --- |
+| prometheus | node-exporter | 9100 | Host metrics; scraped by `prometheus` via `host.docker.internal` |
 
 ## Internal-only (no host port)
 
