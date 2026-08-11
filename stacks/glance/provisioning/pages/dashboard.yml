@@ -91,7 +91,7 @@ columns:
                 url: "http://grafana.robotics.lab"
                 icon: "si:grafana"
               - title: Immich
-                url: "http://photos.robotics.lab"
+                url: "http://immich.robotics.lab"
                 icon: "si:immich"
               - title: Prometheus
                 url: "http://prometheus.robotics.lab"
@@ -126,7 +126,7 @@ columns:
             url: http://grafana.robotics.lab
             icon: si:grafana
           - title: Immich
-            url: http://photos.robotics.lab
+            url: http://immich.robotics.lab
             icon: si:immich
           - title: Kaneo
             url: https://tasks.autonomousrobotics.club

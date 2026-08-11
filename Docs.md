@@ -160,7 +160,7 @@ must match, same pattern as the main homelab's shared-database passwords:
   `docker-containers` widget can show container status, and the host
   timezone files so the clock widget matches the host. The bookmarks and
   monitor widgets in `pages/dashboard.yml` link to `grafana.robotics.lab`,
-  `photos.robotics.lab` (immich), `prometheus.robotics.lab`, and
+  `immich.robotics.lab` (immich), `prometheus.robotics.lab`, and
   `npm.robotics.lab:81` (NPM's own admin UI, direct port since NPM can't
   proxy itself) alongside the existing `.robotics.lab` entries; all four
   are naming intent, not yet backed by an NPM proxy host or Netbird DNS
@@ -236,7 +236,7 @@ must match, same pattern as the main homelab's shared-database passwords:
   on local disk, not a network share" rule from the main homelab is
   satisfied automatically here. `model-cache` stays a plain named volume,
   it is re-downloadable ML model data, not worth tracking as a bind mount.
-  `glance` links to it at `photos.robotics.lab`, an NPM proxy host to
+  `glance` links to it at `immich.robotics.lab`, an NPM proxy host to
   `2283` and a Netbird DNS entry for that hostname still need setting up,
   see the `glance` note above.
 - **kaneo:** Task tracker. No bundled Postgres, unlike the upstream Kaneo
