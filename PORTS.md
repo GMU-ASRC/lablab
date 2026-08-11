@@ -31,6 +31,7 @@ host (no `-p` mapping) and are not in the table above.
 | worker | worker | Outbound only, reports to `SERVER_URL` |
 | databases | core-postgres | Port 5432, reachable only on `core-data` |
 | databases | core-valkey | Port 6379, reachable only on `core-data` |
+| gitea-runner | gitea-runner | Outbound only, registers against git.sirblob.co |
 
 ## Conflicts and reminders
 

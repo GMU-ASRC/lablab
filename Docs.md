@@ -35,6 +35,7 @@ update pushed from elsewhere), then use Dockge to restart the affected stack.
 | prometheus | prometheus, node-exporter | prom/prometheus:latest, prom/node-exporter:latest | 9090, host (9100) | `./data` | Metrics feeding grafana, Netbird VPN only |
 | ftp | ftp | stilliard/pure-ftpd:latest | 2121, 30000-30009 | `./data`, `./config` | FTPS (TLS enforced), single admin user |
 | databases | core-postgres, core-valkey | postgres:16, valkey/valkey:8-bookworm | none | `./data` | Shared datastore for future stacks, see below |
+| gitea-runner | gitea-runner | gitea/act_runner:latest | none | `./data` | Registers against git.sirblob.co, no local Gitea |
 
 No stack here currently requires a database. `databases` exists so a future
 app can reuse a shared Postgres/Valkey instead of bundling its own, the same
@@ -106,11 +107,12 @@ provisioned datasource in
 
 ## Secrets and `.env`
 
-`worker`, `grafana`, `ftp`, and `databases` need secrets. Each has an
-`.env.example` template; copy it to `.env` and fill in real values
-(`API_SECRET_KEY` for worker, `GRAFANA_ADMIN_USER`/`GRAFANA_ADMIN_PASSWORD`
-for grafana, `FTP_PUBLIC_HOST`/`FTP_USER_PASS` for ftp,
-`POSTGRES_PASSWORD` for databases). `.env` files are gitignored.
+`worker`, `grafana`, `ftp`, `databases`, and `gitea-runner` need secrets.
+Each has an `.env.example` template; copy it to `.env` and fill in real
+values (`API_SECRET_KEY` for worker, `GRAFANA_ADMIN_USER`/
+`GRAFANA_ADMIN_PASSWORD` for grafana, `FTP_PUBLIC_HOST`/`FTP_USER_PASS` for
+ftp, `POSTGRES_PASSWORD` for databases, `GITEA_RUNNER_TOKEN` for
+gitea-runner). `.env` files are gitignored.
 
 ## Per-stack notes
 
@@ -165,6 +167,17 @@ for grafana, `FTP_PUBLIC_HOST`/`FTP_USER_PASS` for ftp,
 - **databases:** `core-postgres` and `core-valkey`, no host ports; reachable
   only over `core-data`. No stack here uses it yet, see "If a stack needs a
   database" above for how to add one.
+- **gitea-runner:** `gitea/act_runner`, no local Gitea, just a runner that
+  registers against the main homelab's Gitea at `git.sirblob.co`
+  (`GITEA_INSTANCE_URL`). Generate `GITEA_RUNNER_TOKEN` on that instance
+  (Site Administration -> Actions -> Runners -> Create new runner, or the
+  repo/org-level equivalent) and copy it into `.env`; a registration token
+  is single-use, once the runner has registered `./data` holds its
+  persistent identity, so it does not need to re-register on restart. Gets
+  the docker socket so Actions jobs can run in containers. No `network_mode:
+  host` needed here (unlike the main homelab's runner, which reaches its
+  Gitea over `localhost`); this one only needs outbound HTTPS to
+  `git.sirblob.co`.
 
 ## Maintenance
 

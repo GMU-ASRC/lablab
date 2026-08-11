@@ -66,3 +66,10 @@ and set `FTP_PUBLIC_HOST` to the host's real reachable address.
 Shared Postgres/Valkey for future stacks to reuse instead of bundling their
 own database. No host ports; nothing uses it yet. See `Docs.md` for how to
 add a stack to it.
+
+### Gitea Runner
+![Runner](https://img.shields.io/badge/act__runner-git.sirblob.co-609926?logo=gitea&logoColor=white)
+
+No local Gitea, just a CI runner that registers against the main homelab's
+Gitea at `git.sirblob.co`. Copy `stacks/gitea-runner/.env.example` to
+`.env` and paste in a registration token generated on that instance.
