@@ -13,6 +13,11 @@ services:
       - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
       - S3_REGION=${S3_REGION:-us-east-1}
       - S3_FORCE_PATH_STYLE=true
+      - CUSTOM_OAUTH_CLIENT_ID=${AUTHENTIK_CLIENT_ID}
+      - CUSTOM_OAUTH_CLIENT_SECRET=${AUTHENTIK_CLIENT_SECRET}
+      - CUSTOM_OAUTH_DISCOVERY_URL=${AUTHENTIK_DISCOVERY_URL:-https://auth.autonomousrobotics.club/application/o/kaneo/.well-known/openid-configuration}
+      - CUSTOM_OAUTH_SCOPES=openid,profile,email
+      - CUSTOM_AUTH_PKCE=true
     ports:
       - 5173:5173
     healthcheck:

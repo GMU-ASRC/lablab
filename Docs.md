@@ -135,7 +135,8 @@ has an `.env.example` template; copy it to `.env` and fill in real values
 (`API_SECRET_KEY` for worker, `GRAFANA_ADMIN_USER`/`GRAFANA_ADMIN_PASSWORD`
 for grafana, `FTP_PUBLIC_HOST`/`FTP_USER_PASS` for ftp, `POSTGRES_PASSWORD`
 for databases, `GITEA_RUNNER_TOKEN` for gitea-runner, `DB_PASSWORD` for
-immich, `AUTH_SECRET`/`S3_ACCESS_KEY_ID`/`S3_SECRET_ACCESS_KEY` for kaneo,
+immich, `AUTH_SECRET`/`S3_ACCESS_KEY_ID`/`S3_SECRET_ACCESS_KEY`/
+`AUTHENTIK_CLIENT_ID`/`AUTHENTIK_CLIENT_SECRET` for kaneo,
 `GITHUB_CLIENT_ID`/`GITHUB_CLIENT_SECRET` for coder). `.env` files are
 gitignored.
 
@@ -254,7 +255,23 @@ must match, same pattern as the main homelab's shared-database passwords:
   pointing at `kaneo:5173` in that same dashboard, and
   `tasks.autonomousrobotics.club` needs adding as the public hostname, both
   external to this repo. `KANEO_CLIENT_URL` is set to that hostname so the
-  app generates correct links once the tunnel is live.
+  app generates correct links once the tunnel is live. Login also supports
+  Authentik: Kaneo has no Authentik-specific integration, but Authentik is
+  a standard OIDC provider, so it goes through Kaneo's Custom OAuth/OIDC
+  block (`CUSTOM_OAUTH_*`) via `CUSTOM_OAUTH_DISCOVERY_URL` rather than the
+  individual authorization/token/userinfo URLs. That needs an OAuth2/OIDC
+  Provider and an Application created in Authentik first (manual, on the
+  main homelab's `arcauth` instance), which is where
+  `AUTHENTIK_CLIENT_ID`/`AUTHENTIK_CLIENT_SECRET` come from; the discovery
+  URL assumes an application slug of `kaneo`, adjust
+  `AUTHENTIK_DISCOVERY_URL` if a different slug gets used. Check Kaneo's
+  own Custom OAuth/OIDC guide for the exact redirect URI to put in
+  Authentik, that value was not in the docs pulled for this. This adds
+  Authentik as another login option alongside Kaneo's own email/password
+  login, it does not replace it: `CUSTOM_OAUTH_AUTO_LOGIN` and
+  `DISABLE_LOGIN_FORM` are deliberately left unset, Kaneo's own docs warn
+  that enabling either on an existing installation can lock out local
+  accounts with unverified email addresses.
 - **coder:** Migrated off its own bundled `coder-db` (`postgres:15`) onto
   the shared `core-postgres`, same as the main homelab's `coder` stack;
   `CODER_DB_PASSWORD` must match `databases/.env`. `scripts/migrate-legacy-stacks.sh`

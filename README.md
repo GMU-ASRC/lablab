@@ -91,9 +91,12 @@ Postgres and Valkey, not shared with `databases`. Copy
 Task tracker. Uses `core-postgres` instead of a bundled Postgres, and the
 existing RustFS bucket for uploads instead of a new MinIO. A `cloudflared`
 sidecar publishes it at `tasks.autonomousrobotics.club` with no inbound
-port opened on the host. Copy `stacks/kaneo/.env.example` to `.env` and
-fill in `KANEO_DB_PASSWORD` (matching `databases/.env`), `AUTH_SECRET`,
-the `S3_*` keys, and `CLOUDFLARE_TUNNEL_TOKEN`.
+port opened on the host. Login supports Authentik SSO (via Custom
+OAuth/OIDC) alongside Kaneo's own email/password login, not instead of it.
+Copy `stacks/kaneo/.env.example` to `.env` and fill in `KANEO_DB_PASSWORD`
+(matching `databases/.env`), `AUTH_SECRET`, the `S3_*` keys,
+`CLOUDFLARE_TUNNEL_TOKEN`, and `AUTHENTIK_CLIENT_ID`/
+`AUTHENTIK_CLIENT_SECRET` once that Application exists in Authentik.
 
 ### Coder
 ![Coder](https://img.shields.io/badge/Coder-:8005-000000?logo=coder&logoColor=white)
