@@ -33,3 +33,4 @@ create_role_and_db() {
 
 create_role_and_db "kaneo" "$KANEO_DB_PASSWORD" "kaneo"
 create_role_and_db "coder" "$CODER_DB_PASSWORD" "coder"
+create_role_and_db "postiz" "$POSTIZ_DB_PASSWORD" "postiz"

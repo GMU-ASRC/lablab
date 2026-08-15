@@ -26,13 +26,13 @@ variables (for example `BACKUP_ROOT`).
 
 1. `./scripts/init-env.sh` then edit every new `.env` with real secrets.
 2. Create the external networks (`docker network create core-data` and
-   `docker network create monitoring-net`, see `Docs.md`).
+   `docker network create monitoring-net`, see `../docs/networking.md`).
 3. Start the stacks in Dockge.
 
 If you are moving off the legacy `/home/arc/stacks` layout instead of
 starting fresh, run `./scripts/migrate-legacy-stacks.sh` after step 2 and
-before step 3 for `npm`, `dockge`, and `coder`; see "Migrating off the
-legacy `/home/arc/stacks` layout" in `Docs.md` for what it does.
+before step 3 for `npm`, `dockge`, and `coder`; see `../docs/migration.md`
+for what it does.
 
 ## Backups
 

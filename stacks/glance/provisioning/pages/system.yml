@@ -34,3 +34,5 @@ columns:
           - usekaneo/kaneo
           - cloudflare/cloudflared
           - coder/coder
+          - gitroomhq/postiz-app
+          - temporalio/temporal

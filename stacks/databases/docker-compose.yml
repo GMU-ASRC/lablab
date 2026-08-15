@@ -9,6 +9,7 @@ services:
       POSTGRES_DB: postgres
       KANEO_DB_PASSWORD: ${KANEO_DB_PASSWORD}
       CODER_DB_PASSWORD: ${CODER_DB_PASSWORD}
+      POSTIZ_DB_PASSWORD: ${POSTIZ_DB_PASSWORD}
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
       - ./init:/docker-entrypoint-initdb.d:ro

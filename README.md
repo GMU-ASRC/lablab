@@ -10,12 +10,12 @@ Configuration-as-code for **MochaNet** — the ARC homelab server.
 
 Each folder under `stacks/` is an independent Dockge stack, same layout as
 the main homelab. This checkout is the live Dockge stacks directory on the
-server — there is no separate deploy step. See `Docs.md` for the deployment
-model.
+server — there is no separate deploy step. See `docs/README.md` for the
+deployment model.
 
 ## Documentation
 
-- [Docs.md](Docs.md) - deployment model, services table, per-stack notes.
+- [docs/](docs/README.md) - deployment model, services table, networking, secrets, and per-stack notes.
 - [PORTS.md](PORTS.md) - every published host port and what owns it.
 - [scripts/README.md](scripts/README.md) - the helper scripts (env bootstrap).
 - [docker.md](docker.md) - enabling NVIDIA GPU support in Docker on this host.
@@ -67,8 +67,8 @@ and set `FTP_PUBLIC_HOST` to the host's real reachable address.
 ![Valkey](https://img.shields.io/badge/Valkey-core--valkey-DC382D?logo=redis&logoColor=white)
 
 Shared Postgres/Valkey for future stacks to reuse instead of bundling their
-own database. No host ports; nothing uses it yet. See `Docs.md` for how to
-add a stack to it.
+own database. No host ports; nothing uses it yet. See `docs/networking.md`
+for how to add a stack to it.
 
 ### Gitea Runner
 ![Runner](https://img.shields.io/badge/act__runner-git.sirblob.co-609926?logo=gitea&logoColor=white)
@@ -100,6 +100,26 @@ to `.env` and fill in `KANEO_DB_PASSWORD` (matching `databases/.env`),
 `AUTH_SECRET`, the `S3_*` keys, `CLOUDFLARE_TUNNEL_TOKEN`, and
 `AUTHENTIK_CLIENT_ID`/`AUTHENTIK_CLIENT_SECRET` once that Application
 exists in Authentik.
+
+### Postiz
+![Postiz](https://img.shields.io/badge/Postiz-:4007-0EA5E9?logoColor=white)
+![Cloudflare Tunnel](https://img.shields.io/badge/public%20via-Cloudflare%20Tunnel-F38020?logo=cloudflare&logoColor=white)
+
+Social media scheduler. Uses `core-postgres`/`core-valkey` for its own app
+database and cache, like Kaneo, but bundles a dedicated Temporal cluster
+(its own Postgres and Elasticsearch) for the workflow engine that drives
+scheduled posts, since Temporal's `auto-setup` needs `CREATEDB` rights the
+shared database doesn't grant it. A `cloudflared` sidecar publishes it at
+`social.autonomousrobotics.club` with no inbound port opened on the host.
+The Temporal Web UI is published on host port `8088` instead of its
+default `8080`, since Glance already owns `8080`; both it and Temporal's
+gRPC port `7233` are bound to `127.0.0.1` only. Copy
+`stacks/postiz/.env.example` to `.env` and fill in `POSTIZ_DB_PASSWORD`
+(matching `databases/.env`), `JWT_SECRET`, `TEMPORAL_DB_PASSWORD`,
+`CLOUDFLARE_TUNNEL_TOKEN`, and the platform API keys for the three
+networks wired up: LinkedIn, Instagram (via a Facebook app), and
+YouTube. Authentik SSO and the platform keys are all optional and can be
+left blank.
 
 ### Coder
 ![Coder](https://img.shields.io/badge/Coder-:8005-000000?logo=coder&logoColor=white)

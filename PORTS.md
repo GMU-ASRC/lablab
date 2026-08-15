@@ -12,9 +12,12 @@ container port it maps to. Use this to avoid collisions when adding services.
 | 2283 | tcp | immich | immich_server | 2283 | Immich web/API |
 | 3300 | tcp | grafana | grafana | 3000 | Grafana web (Netbird VPN only, grafana.robotics.lab) |
 | 5001 | tcp | dockge | dockge | 5001 | Dockge UI |
+| 4007 | tcp | postiz | postiz | 5000 | Postiz web (also public via Cloudflare Tunnel) |
 | 5173 | tcp | kaneo | kaneo | 5173 | Kaneo web (also public via Cloudflare Tunnel) |
+| 7233 | tcp | postiz | temporal | 7233 | Temporal gRPC, loopback only (127.0.0.1), admin/debug access |
 | 8005 | tcp | coder | coder | 3000 | Coder web (coder.robotics.lab) |
 | 8080 | tcp | glance | glance | 8080 | Glance dashboard |
+| 8088 | tcp | postiz | temporal-ui | 8080 | Temporal Web UI, loopback only (127.0.0.1); remapped from upstream's 8080, which collides with glance |
 | 9090 | tcp | prometheus | prometheus | 9090 | Prometheus UI/API (Netbird VPN only) |
 | 30000-30009 | tcp | ftp | ftp | 30000-30009 | FTP passive port range |
 
@@ -39,6 +42,10 @@ host (no `-p` mapping) and are not in the table above.
 | immich | immich_redis | Port 6379, default network |
 | immich | immich_machine_learning | Port 3003, default network |
 | kaneo | kaneo-cloudflared | Outbound only, Cloudflare Tunnel to tasks.autonomousrobotics.club |
+| postiz | postiz-cloudflared | Outbound only, Cloudflare Tunnel to social.autonomousrobotics.club |
+| postiz | temporal-postgresql | Port 5432, internal to `temporal-network`, not on `core-data` |
+| postiz | temporal-elasticsearch | Port 9200, internal to `temporal-network`, not on `core-data` |
+| postiz | temporal-admin-tools | Interactive CLI only (`docker exec`), no listening port |
 
 ## Conflicts and reminders
 
