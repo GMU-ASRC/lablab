@@ -23,6 +23,14 @@ services:
       - GITHUB_PRIVATE_KEY=${GITHUB_PRIVATE_KEY:-}
       - GITHUB_PRIVATE_KEY_BASE64=${GITHUB_PRIVATE_KEY_BASE64:-}
       - GITHUB_APP_NAME=${GITHUB_APP_NAME:-}
+      - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_SECURE=${SMTP_SECURE:-false}
+      - SMTP_REQUIRE_TLS=${SMTP_REQUIRE_TLS:-true}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-}
+      - SMTP_FROM=${SMTP_FROM:-}
+      - DISABLE_EMAIL_OTP_SIGN_IN=${DISABLE_EMAIL_OTP_SIGN_IN:-false}
     ports:
       - 5173:5173
     healthcheck:

@@ -45,4 +45,24 @@ files), or base64-encode it into `GITHUB_PRIVATE_KEY_BASE64` instead,
 which takes precedence if both are set. `GITHUB_APP_NAME` is optional,
 only used for installation links in Kaneo's UI. This whole block is
 optional; leaving all five unset just leaves GitHub repo sync/webhooks
-off.
+off. Outbound mail (workspace invitations, email sign-in codes) goes
+through Gmail's SMTP relay rather than a self-hosted mail server:
+`SMTP_HOST=smtp.gmail.com` on port `587` with `SMTP_SECURE=false` and
+`SMTP_REQUIRE_TLS=true`, which is STARTTLS, Gmail's implicit-TLS port
+`465` works too but needs `SMTP_PORT=465` and `SMTP_SECURE=true`
+together. `SMTP_PASSWORD` is a Google App Password, not the account
+password: App Passwords only exist once 2-Step Verification is on for
+the account, generated at
+[myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords),
+and the 16-character value is entered without its display spaces. That is
+a manual step on the Google account, external to this repo. Gmail
+rewrites the `From` header to the authenticated account unless the
+address is a verified "Send mail as" alias, so `SMTP_FROM` should use
+`SMTP_USER`'s address to avoid surprises. Note free Gmail accounts cap
+outbound relay at roughly 500 recipients per day, fine for invitations
+and sign-in codes, not for bulk notification volume. Enabling SMTP
+changes login behaviour: Kaneo switches sign-in to emailed verification
+codes by default the moment SMTP is configured, so
+`DISABLE_EMAIL_OTP_SIGN_IN` is passed through explicitly and left at
+`false` (codes on); set it to `true` to keep email/password sign-in,
+invitation emails keep using SMTP either way.
